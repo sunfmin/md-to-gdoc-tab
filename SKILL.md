@@ -16,7 +16,7 @@ Render a local Markdown file into a specific tab inside a Google Doc. Re-running
 ## When NOT to use
 
 - The Google Doc has comments / suggestions on the target tab that need to be preserved. (Clear+rebuild loses positional comments.)
-- The Markdown uses features outside the supported subset (tables, images, code blocks, links, inline bold/italic). Either extend `render.py` first, or use Google Docs UI's "Paste from Markdown".
+- The Markdown uses features outside the supported subset (images, code blocks, links, inline bold/italic). Either extend `render.py` first, or use Google Docs UI's "Paste from Markdown". (GFM tables ARE supported, but only as the file's last block.)
 - Updating across multiple tabs in one go. Run the skill once per tab.
 
 ## Prerequisites
@@ -77,9 +77,14 @@ Order matters: deleteContentRange wipes the body so indices in subsequent reques
 | `    - sub-item` (4 spaces) | Bullet at level 1 (`◦`)               |
 | `        - deeper` (8 spaces) | Bullet at level 2 (`■`)             |
 | `---` (horizontal rule) | Skipped                                    |
+| GFM table (`\| a \| b \|`) | Real Google Docs table — bold header, fixed-width cols. **Last block only** (rendered structurally via a multi-phase insertTable, see below) |
 | YAML frontmatter at top | Stripped before parsing                    |
 
-Not yet supported: tables, images, code blocks, links, inline `**bold**` / `*italic*`. Extend `render.py` and add a row above when you add support.
+Not yet supported: images, code blocks, links, inline `**bold**` / `*italic*`. Extend `render.py` and add a row above when you add support.
+
+### Tables (how they render)
+
+A trailing GFM table can't ride along in the body `insertText` (a Docs table is structural), so `render_table()` runs after the text rebuild in extra phases: (1) `insertTable` at the end of the tab segment; (2) re-fetch to read each cell's content index; (3) set fixed column widths + insert each cell's text in **descending index order** so earlier inserts don't shift later cells; (4) re-fetch and bold the header row. Re-runs are still idempotent — the body clear in phase 1 of the text rebuild deletes the prior table too.
 
 ## Cosmetic quirk
 

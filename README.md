@@ -55,9 +55,10 @@ Open the doc, click the tab you want, look at the URL — it ends in `tab=t.XXXX
 | `    - sub-item` (4 spaces) | Bullet at level 1 (`◦`)               |
 | `        - deeper` (8 spaces) | Bullet at level 2 (`■`)             |
 | `---` (horizontal rule) | Skipped                                    |
+| GFM table (`\| a \| b \|`) | Real Google Docs table — bold header, fixed-width cols (last block only) |
 | YAML frontmatter at top | Stripped before parsing                    |
 
-Not yet supported: tables, images, code blocks, links, inline `**bold**` / `*italic*`. PRs welcome.
+Not yet supported: images, code blocks, links, inline `**bold**` / `*italic*`. PRs welcome.
 
 ## How it works
 
